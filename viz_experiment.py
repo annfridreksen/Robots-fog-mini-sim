@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def simulate_latencies(n_tasks=25, seed=7):
     random.seed(seed)
     s = [random.randint(20, 60) for _ in range(n_tasks)]
-    f = [random.randint(30, 80) for _ in range(n_tasks)]
+    f = [random.randint(10, 20) for _ in range(n_tasks)]#задержка Fog  ← измените здесь!
     c = [random.randint(10, 40) for _ in range(n_tasks)]
     return [a+b+d for a,b,d in zip(s,f,c)]
 
