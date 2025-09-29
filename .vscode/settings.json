@@ -1,11 +1,3 @@
 {
-  "python.formatting.provider": "none",
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true
-  },
-  "jupyter.askForKernelRestart": false,
-  "jupyter.notebookFileRoot": "${workspaceFolder}",
-  "python-envs.defaultEnvManager": "ms-python.python:system",
-  "python-envs.pythonProjects": []
+  "python.formatting.provider": "none"
 }

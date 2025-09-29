@@ -1,71 +1,41 @@
-"""viz_phone_pipeline.py
-
-Мини-визуализация: 3 шага (датчик → fog → курьер) + мобильный телефон-приёмник.
-Показываем:
-  • задержку «от датчика до телефона» для каждой задачи;
-  • наполняемость буфера телефона во времени;
-  • метрика: средняя сквозная задержка (ms).
-Стандартные библиотеки: random, statistics, matplotlib.
+"""
+viz_phone_pipeline.py — задержка + буфер телефона (RU/EN)
 """
 import random, statistics
 import matplotlib.pyplot as plt
 
-def simulate(n_tasks=30, seed=7):
+def simulate(n_tasks=25, seed=7):
     random.seed(seed)
-
-    # Время обработки (ms) на каждом этапе — простая дискретная модель
-    sensor = [random.randint(20, 60) for _ in range(n_tasks)]
-    fog    = [random.randint(30, 80) for _ in range(n_tasks)]
-    courier= [random.randint(10, 40) for _ in range(n_tasks)]
-
-    # Считаем сквозную задержку на задачу (последовательно: датчик→fog→курьер→телефон)
-    latencies = [s + f + c for s, f, c in zip(sensor, fog, courier)]
-
-    # Простейшая модель буфера телефона:
-    # телефон «читает» сообщения каждые read_interval_ms миллисекунд
+    s  = [random.randint(20, 60) for _ in range(n_tasks)]
+    f  = [random.randint(30, 80) for _ in range(n_tasks)]
+    c  = [random.randint(10, 40) for _ in range(n_tasks)]
+    lat = [a+b+d for a,b,d in zip(s,f,c)]
     read_interval_ms = 120
-    time = 0
-    buffer_sizes = []
-    buf = 0
-    for i, L in enumerate(latencies, start=1):
-        # к моменту доставки i‑го сообщения увеличиваем время
+    time = 0; buf=0; buf_sizes=[]
+    for L in lat:
         time += L
-        # каждое read_interval_ms телефон читает из буфера одно сообщение (если есть)
-        reads = time // read_interval_ms  # сколько раз телефон успел прочитать
-        # ограничим списание буфера
+        reads = time // read_interval_ms
         for _ in range(int(reads)):
-            if buf > 0:
-                buf -= 1
-        # новое сообщение приходит в буфер
+            if buf>0: buf -= 1
         buf += 1
-        buffer_sizes.append(buf)
-
-    avg_latency = statistics.mean(latencies)
-    return latencies, buffer_sizes, avg_latency
-
-def plot(latencies, buffer_sizes):
-    # График 1: задержка каждой задачи
-    plt.figure(figsize=(8, 4.5))
-    plt.plot(range(1, len(latencies)+1), latencies, marker='o')
-    plt.title("End-to-End Latency to Phone (ms)")
-    plt.xlabel("Task #")
-    plt.ylabel("Latency (ms)")
-    plt.tight_layout()
-    plt.show()
-
-    # График 2: размер буфера телефона по мере поступления задач
-    plt.figure(figsize=(8, 4.5))
-    plt.plot(range(1, len(buffer_sizes)+1), buffer_sizes, marker='s')
-    plt.title("Phone Buffer Size over Tasks")
-    plt.xlabel("Task # (arrival order)")
-    plt.ylabel("Messages in buffer")
-    plt.tight_layout()
-    plt.show()
+        buf_sizes.append(buf)
+    return lat, buf_sizes, statistics.mean(lat)
 
 def main():
-    latencies, buffer_sizes, avg_latency = simulate()
-    print(f"Average end-to-end latency to phone (ms): {avg_latency:.2f}")
-    plot(latencies, buffer_sizes)
+    lat, buf_sizes, avg = simulate()
+    # Latency chart
+    plt.figure(figsize=(8,4.5))
+    plt.plot(range(1,len(lat)+1), lat, marker='o')
+    plt.title("Задержка до телефона / Latency to Phone (ms)")
+    plt.xlabel("Задача / Task #"); plt.ylabel("Задержка, мс / Latency, ms")
+    plt.tight_layout(); plt.show()
+    # Buffer chart
+    plt.figure(figsize=(8,4.5))
+    plt.plot(range(1,len(buf_sizes)+1), buf_sizes, marker='s')
+    plt.title("Буфер телефона / Phone Buffer Size")
+    plt.xlabel("Задача / Task #"); plt.ylabel("Сообщений в буфере / Messages")
+    plt.tight_layout(); plt.show()
+    print("Average latency (ms):", round(avg,2))
 
 if __name__ == "__main__":
     main()
