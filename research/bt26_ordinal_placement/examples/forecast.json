@@ -1,0 +1,1 @@
+{"data_status":"SYNTHETIC_NOT_A_TRAINED_NEURAL_NETWORK","kind":"synthetic_control","provenance":"deliberate unit test","scale_id":"ordinal-test-v1","direction":"smaller_is_preferred","task_class":"synthetic-chain","partition_version":"A2-B1-C1-v1","load_scope":"synthetic-control-before-start-v1","issued_at_s":"0","valid_until_s":"1","commands":{"E":1,"F":2}}
